@@ -149,7 +149,7 @@ Le rapport complet de l'étude est disponible ici :
 ## Auteurs
 
 - **Amélie Pires**
-- Ikram Abouzayd**
+- Ikram Abouzayd
   
 Master 1 Économétrie Appliquée — Modélisation avec des variables latentes — IAE Nantes, 2025-2026
 
@@ -157,4 +157,4 @@ Master 1 Économétrie Appliquée — Modélisation avec des variables latentes 
 
 **Amélie Pires**
 
-Mail : [amelie.pires@hotmail.com](mailto:amelie.pires@hotmail.com) · LinkedIn : [amelie-pires](https://www.linkedin.com/in/amelie-pires) · GitHub : [aps-18](https://github.com/aps-18)
+Mail : [amelie.pires@hotmail.com](mailto:amelie.pires@hotmail.com) · [LinkedIn](https://www.linkedin.com/in/amelie-pires) · [GitHub](https://github.com/aps-18)
