@@ -119,12 +119,65 @@ outliers_logement_equipement
 \vspace{2cm}
 
 
-
-
-
 \newpage
 
-# 3) ACP a faire
+# 3) ACP 
+
+```{r}
+library(FactoMineR)
+library(factoextra)
+library(dplyr)
+
+# Variables retenues pour l'ACP
+data_acp <- OECD %>%
+  select(
+    logements_sans_equipements_pct,
+    pieces_par_personne,
+    revenu_disponible_menages,
+    patrimoine_financier_menages,
+    insecurite_marche_travail_pct,
+    taux_emploi_pct,
+    revenus_du_travail_usd,
+    soutien_social_pct,
+    niveau_education_pct,
+    competences_eleves_score,
+    annees_education,
+    qualite_eau_pct,
+    esperance_vie_ans,
+    satisfaction_vie_score,
+    sentiment_securite_nuit_pct
+  )
+
+# ACP sur variables centrées-réduites
+acp <- PCA(
+  data_acp,
+  scale.unit = TRUE,
+  graph = FALSE
+)
+
+# Cercle des corrélations
+p_acp <- fviz_pca_var(
+  acp,
+  col.var = "cos2",
+  repel = TRUE,
+  labelsize = 3
+) +
+  labs(
+    title = "ACP des conditions de vie dans les pays de l'OCDE"
+  ) +
+  theme_minimal()
+
+p_acp
+
+ggsave(
+  "figures/acp_cercle_correlations.png",
+  plot = p_acp,
+  width = 10,
+  height = 7,
+  dpi = 300
+)
+```
+
 
 # 4) PCR
 
@@ -133,9 +186,8 @@ outliers_logement_equipement
 #| message: false
 #| warning: false
 
-# ==============================================================================
 # 1. PRÉPARATION DES DONNÉES ET SPLIT
-# ==============================================================================
+
 
 # Sélection des variables (on garde la liste 'vars' présente dans acp)
 vars <- c(
@@ -165,9 +217,9 @@ p <- ncol(train) - 1
 ```{r}
 #| message: false
 #| warning: false
-# ==============================================================================
+
 # 2. CONSTRUCTION DU MODÈLE PCR ET VALIDATION CROISÉE
-# ==============================================================================
+
 model_pcr <- pcr(satisfaction_vie_score ~ ., 
                  data = train,
                  scale = TRUE,
@@ -190,9 +242,9 @@ par(mfrow = c(1, 1))
 ```{r}
 #| message: false
 #| warning: false
-# ==============================================================================
+
 # 3. PERFORMANCE POUR CHAQUE NOMBRE DE COMPOSANTES
-# ==============================================================================
+
 
 R2_test_all <- sapply(1:p, function(n) {
   pred <- predict(model_pcr, newdata = test, ncomp = n)
@@ -218,9 +270,8 @@ perf_pcr
 ```{r}
 #| message: false
 #| warning: false
-# ==============================================================================
+
 # 5. COMPARAISON AVEC MODÈLE LINÉAIRE
-# ==============================================================================
 
 # Modele pcr 
 
@@ -258,9 +309,8 @@ kable(comparaison, caption = "Comparaison des modèles") %>%
 ```{r}
 #| message: false
 #| warning: false
-# ==============================================================================
+
 # 6. GRAPH DIAGNOSTIC
-# ==============================================================================
 
 comparison_pcr <- data.frame(
   Reel = test$satisfaction_vie_score,
@@ -280,9 +330,7 @@ ggplot(comparison_pcr, aes(x = Reel, y = Predit)) +
 
 
 ```{r}
-# ------------------------------------------------------------------------------
 # 1. Fonction VIP 
-# ------------------------------------------------------------------------------
 get_vip <- function(model, ncomp) {
   b <- c(model$Yloadings)[1:ncomp]
   T <- model$scores[,1:ncomp, drop = FALSE]
@@ -295,11 +343,9 @@ get_vip <- function(model, ncomp) {
 ```
 
 ```{r}
-# ------------------------------------------------------------------------------
 # 2. Ajustement du modèle PLS (Entraînement avec LOO)
-# ------------------------------------------------------------------------------
 set.seed(123)
-# Changement : validation = "LOO" (Leave-One-Out) selon le conseil de la prof
+#validation = "LOO" (conseil de la prof)
 model_pls <- plsr(satisfaction_vie_score ~ ., 
                   data = train, 
                   scale = TRUE, 
@@ -308,9 +354,7 @@ model_pls <- plsr(satisfaction_vie_score ~ .,
 ```
 
 ```{r}
-# ------------------------------------------------------------------------------
 # 3. SÉLECTION DU NOMBRE OPTIMAL DE COMPOSANTES
-# ------------------------------------------------------------------------------
 
 k_opt_pls <- selectNcomp(model_pls, method = "onesigma", plot = TRUE)
 
@@ -324,9 +368,7 @@ kable(data.frame(Composantes_retenues = k_opt_pls),
 
 
 ```{r}
-# ------------------------------------------------------------------------------
 # 4. ÉVOLUTION DES PERFORMANCES (TRAIN vs TEST)
-# ------------------------------------------------------------------------------
 
 max_comp <- p
 
@@ -359,9 +401,7 @@ ggplot(perf_df, aes(x = Comp, y = RMSE, color = Type)) +
 
 
 ```{r}
-# ------------------------------------------------------------------------------
 # 5. R² SUR TEST SELON LE NOMBRE DE COMPOSANTES
-# ------------------------------------------------------------------------------
 
 R2_test_pls_all <- sapply(1:max_comp, function(n) {
   pred <- predict(model_pls, newdata = test, ncomp = n)
@@ -380,9 +420,7 @@ kable(perf_pls, caption = "R² sur test selon le nombre de composantes") %>%
 
 
 ```{r}
-# ------------------------------------------------------------------------------
 # 6. PERFORMANCE GLOBALE (TRAIN ET TEST)
-# ------------------------------------------------------------------------------
 
 pred_train_pls <- predict(model_pls, ncomp = k_opt_pls)
 pred_test_pls  <- predict(model_pls, newdata = test, ncomp = k_opt_pls)
@@ -409,9 +447,7 @@ kable(result_pls, caption = "Performance globale du modèle PLS") %>%
 
 
 ```{r}
-# ------------------------------------------------------------------------------
 # 7. IMPORTANCE DES VARIABLES (VIP ET COEFFICIENTS)
-# ------------------------------------------------------------------------------
 
 vips_valeurs <- get_vip(model_pls, k_opt_pls)
 coeffs_valeurs <- as.numeric(coef(model_pls, ncomp = k_opt_pls))
@@ -423,7 +459,7 @@ df_importance <- data.frame(
 )
 
 # VIP
-ggplot(df_importance, aes(x = reorder(Variable, VIP), y = VIP)) +
+p_vip <- ggplot(df_importance, aes(x = reorder(Variable, VIP), y = VIP)) +
   geom_bar(stat = "identity",
            fill = ifelse(df_importance$VIP > 1, "firebrick", "steelblue")) +
   geom_hline(yintercept = 1, linetype = "dashed") +
@@ -431,6 +467,16 @@ ggplot(df_importance, aes(x = reorder(Variable, VIP), y = VIP)) +
   labs(title = "Importance des variables (VIP)",
        x = "Variables", y = "VIP") +
   theme_minimal()
+
+p_vip
+
+ggsave(
+  "figures/importance_variables_pls.png",
+  plot = p_vip,
+  width = 9,
+  height = 6,
+  dpi = 300
+)
 
 # Coefficients
 ggplot(df_importance, aes(x = reorder(Variable, Coefficient), y = Coefficient)) +
@@ -444,18 +490,34 @@ ggplot(df_importance, aes(x = reorder(Variable, Coefficient), y = Coefficient)) 
 
 
 ```{r}
-# ------------------------------------------------------------------------------
 # 8. DIAGNOSTIC : RÉEL VS PRÉDIT
-# ------------------------------------------------------------------------------
-ggplot(data.frame(Reel = test$satisfaction_vie_score, Predit = as.vector(pred_test_pls)), 
-       aes(x = Reel, y = Predit)) +
+p_predictions_pls <- ggplot(
+  data.frame(
+    Reel = test$satisfaction_vie_score,
+    Predit = as.vector(pred_test_pls)
+  ),
+  aes(x = Reel, y = Predit)
+) +
   geom_point(color = "darkblue", alpha = 0.6) +
   geom_abline(intercept = 0, slope = 1, color = "red", linetype = "dashed") +
-  labs(title = "PLS : Valeurs réelles vs prédites",
-       subtitle = paste("R² sur Test =", round(R2_test_pls, 3)),
-       x = "Satisfaction réelle", y = "Satisfaction prédite") +
+  labs(
+    title = "PLS : Valeurs réelles vs prédites",
+    subtitle = paste("R² sur Test =", round(R2_test_pls, 3)),
+    x = "Satisfaction réelle",
+    y = "Satisfaction prédite"
+  ) +
   theme_minimal() +
   coord_fixed()
+
+p_predictions_pls
+
+ggsave(
+  "figures/predictions_pls.png",
+  plot = p_predictions_pls,
+  width = 7,
+  height = 6,
+  dpi = 300
+)
 ```
 
 
@@ -463,12 +525,7 @@ ggplot(data.frame(Reel = test$satisfaction_vie_score, Predit = as.vector(pred_te
 # 6) comparaison des modeles
 
 ```{r}
-# ==============================================================================
 # TABLEAU COMPARATIF FINAL
-# ==============================================================================
-
-# On s'assure que k_opt_pcr et k_opt_pls sont bien définis
-# (Si k_opt a été utilisé pour les deux, vérifie bien leurs noms)
 
 tableau_final <- data.frame(
   Méthode = c("Régression Linéaire (LM)", "PCR", "PLS"),
