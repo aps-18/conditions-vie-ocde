@@ -1,6 +1,6 @@
 # Analyse des conditions de vie dans les pays de l'OCDE
 
-Projet réalisé dans le cadre du cours de Modélisation avec des variables latentes, réalisé par Véronique Cariou en Master 1 Économétrie Appliquée à l'IAE Nantes.
+Projet réalisé dans le cadre du cours de modélisation avec des variables latentes, par Véronique Cariou en Master 1 Économétrie Appliquée à l'IAE Nantes.
 
 L'objectif est d'analyser les principales dimensions associées aux conditions de vie dans les pays de l'OCDE et d'étudier la capacité de différentes méthodes de réduction de dimension à modéliser et prédire la satisfaction dans la vie.
 
