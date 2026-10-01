@@ -538,6 +538,13 @@ tableau_final <- data.frame(
 knitr::kable(tableau_final, 
              digits = 4, 
              caption = "Synthèse des performances sur l'échantillon TEST")
+
+# Enregistrement du tableau comparatif
+write.csv(
+  tableau_final,
+  "figures/comparaison_modeles.csv",
+  row.names = FALSE
+)
 ```
 
 
