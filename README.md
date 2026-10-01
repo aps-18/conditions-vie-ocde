@@ -144,7 +144,7 @@ conditions-vie-ocde/
 
 Le rapport complet de l'étude est disponible ici :
 
-[Consulter le rapport](rapport/rapport.pdf)
+➡️ [Consulter le rapport](rapport/rapport.pdf)
 
 ## Auteurs
 
