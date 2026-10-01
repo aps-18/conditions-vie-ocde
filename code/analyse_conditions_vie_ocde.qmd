@@ -68,8 +68,7 @@ library(pls)
 #| warning: false
 
 # Importation base de donnée
-OECD  <- read_csv("C:\\Users\\ikram\\OneDrive\\Documents\\Master 1 ECAP\\Semestre 2\\Modelisation variables latentes\\projet\\base_OECD_clean.csv")
-
+OECD <- read_csv("data/base_OECD_clean.csv")
 
 # Transformation de la variable Pays en nom de ligne
 OECD <- column_to_rownames(OECD, var = "Pays")
