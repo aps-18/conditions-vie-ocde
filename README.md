@@ -59,6 +59,8 @@ Trois approches sont comparées :
 
 Le nombre de composantes est sélectionné par validation croisée.
 
+> Le fichier `.qmd` contient le code des modèles de régression (linéaire, PCR, PLS). L'ACP et la classification (PLS-DA, sPLS-DA) sont présentées dans le rapport complet.
+
 ## Résultats
 
 La réduction de dimension améliore nettement les performances par rapport à la régression linéaire classique.
@@ -77,13 +79,26 @@ L'analyse des **VIP (Variable Importance in Projection)** permet d'identifier le
 
 Parmi les variables qui ressortent figurent notamment le taux d'emploi, les revenus du travail, le revenu disponible des ménages, le nombre de pièces par personne, la qualité de l'eau et l'insécurité du marché du travail.
 
-![Importance des variables dans le modèle PLS](figures/importance_variables_pls.png)
+![Importance des variables dans le modèle ](figures/importance_variables_pls.png)
 
 ### Valeurs réelles et prédites
 
 Le modèle PLS reproduit correctement la tendance générale de la satisfaction dans la vie sur l'échantillon test, avec un **R² de 0,584**.
 
 ![Valeurs réelles et prédites — PLS](figures/predictions_pls.png)
+
+### Classification des profils de bien-être
+
+La satisfaction dans la vie est discrétisée en trois niveaux (faible, moyen, élevé) afin de classer les pays selon leur niveau de bien-être. Deux méthodes supervisées sont comparées : **PLS-DA** et **sPLS-DA** (avec sélection de variables).
+
+| Modèle   | Composantes | Variables  | Accuracy test |
+|----------|------------:|------------|--------------:|
+| PLS-DA   | 1           | Toutes     | **70 %**      |
+| sPLS-DA  | 1           | 8 retenues | 60 %          |
+
+Les classes « faible » et « élevé » sont bien identifiées, tandis que la classe « moyen » est la plus difficile à prédire car elle chevauche les deux autres. Les variables les plus discriminantes sont les revenus du travail, la qualité de l'eau, les années d'éducation et le taux d'emploi.
+
+> L'échantillon test ne contient que 10 pays : ces performances sont à interpréter avec prudence.
 
 ## Méthodes utilisées
 
@@ -96,6 +111,9 @@ Le modèle PLS reproduit correctement la tendance générale de la satisfaction 
 - Séparation apprentissage / test
 - Analyse des VIP
 - Évaluation prédictive par R² et RMSE
+- Classification supervisée (3 niveaux de satisfaction)
+- PLS-DA
+- sPLS-DA
 
 ## Technologies
 
